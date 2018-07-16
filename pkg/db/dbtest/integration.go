@@ -17,6 +17,7 @@ func Setup(t *testing.T) db.DB {
 	config := &db.Config{
 		RawURI:        "postgres://postgres@users-db.local:5432/users_test?sslmode=disable",
 		MigrationsDir: "/go/src/github.com/marccarre/kubernetes-deployment-strategies-workload/pkg/db/migrations",
+		SchemaVersion: db.SchemaVersion,
 	}
 	database, err := db.NewPostgreSQLDB(config)
 	assert.NoError(t, err)

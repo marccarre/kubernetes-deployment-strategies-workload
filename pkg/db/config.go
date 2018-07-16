@@ -14,11 +14,13 @@ type Config struct {
 	RawURI        string
 	passwordFile  string
 	MigrationsDir string
+	SchemaVersion uint
 }
 
 const (
 	dbURI           = "db-uri"
 	dbMigrationsDir = "db-migrations-dir"
+	dbSchemaVersion = "db-schema-version"
 	dbPasswdFile    = "db-passwd-file"
 )
 
@@ -27,6 +29,7 @@ func (cfg *Config) RegisterFlags(f *flag.FlagSet) {
 	f.StringVar(&cfg.RawURI, dbURI, "postgres://postgres@localhost:5432/users?sslmode=disable", "URI to connect to the database")
 	f.StringVar(&cfg.passwordFile, dbPasswdFile, "", fmt.Sprintf("File containing the password to authenticate against the database (username goes in --%v)", dbURI))
 	f.StringVar(&cfg.MigrationsDir, dbMigrationsDir, "/home/service/migrations", "Directory containing the database migrations to apply on application startup")
+	f.UintVar(&cfg.SchemaVersion, dbSchemaVersion, SchemaVersion, "Version of the schema of the database. This version will be applied on application startup")
 }
 
 // URI parses this configuration object's database URI, reads the database password from the specified file, and injects it in the URI it returns.

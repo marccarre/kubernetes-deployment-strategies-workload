@@ -20,6 +20,7 @@ func TestParsingEmptyArgumentsShouldReturnDefaultConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "postgres://postgres@localhost:5432/users?sslmode=disable", uri)
 	assert.Equal(t, "/home/service/migrations", config.MigrationsDir)
+	assert.Equal(t, uint(1), config.SchemaVersion)
 }
 
 func TestParsingArgumentsShouldOverrideDefaultConfig(t *testing.T) {
@@ -35,6 +36,7 @@ func TestParsingArgumentsShouldOverrideDefaultConfig(t *testing.T) {
 		"--db-uri", "postgres://foo@bar:1337/baz?sslmode=verify-full",
 		"--db-passwd-file", passwordFile.Name(),
 		"--db-migrations-dir", migrationsDir,
+		"--db-schema-version", "42",
 	})
 	assert.NotNil(t, config)
 
@@ -42,6 +44,7 @@ func TestParsingArgumentsShouldOverrideDefaultConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "postgres://foo:s3cr3t@bar:1337/baz?sslmode=verify-full", uri)
 	assert.Equal(t, migrationsDir, config.MigrationsDir)
+	assert.Equal(t, uint(42), config.SchemaVersion)
 }
 
 func TestInvalidDatabaseURIShouldReturnError(t *testing.T) {

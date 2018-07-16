@@ -7,6 +7,10 @@ import (
 	"github.com/marccarre/kubernetes-deployment-strategies-workload/pkg/domain"
 )
 
+// SchemaVersion is the current version of the DB schema.
+// N.B.: this constant should be updated every time new migrations are added.
+const SchemaVersion = uint(1)
+
 // DB is the interface for a database client.
 type DB interface {
 	// Ping ensures this database client can reach the database.

@@ -33,7 +33,7 @@ func NewPostgreSQLDB(config *Config) (*PostgreSQLDB, error) {
 		log.WithField("uri", uri).WithField("err", err).Error("failed to open connection")
 		return nil, err
 	}
-	if err := runDBMigrations(db, config.MigrationsDir, uri); err != nil {
+	if err := runDBMigrations(db, config.MigrationsDir, config.SchemaVersion, uri); err != nil {
 		return nil, err
 	}
 	return &PostgreSQLDB{
@@ -41,7 +41,7 @@ func NewPostgreSQLDB(config *Config) (*PostgreSQLDB, error) {
 	}, nil
 }
 
-func runDBMigrations(db *sql.DB, migrationsDir, uri string) error {
+func runDBMigrations(db *sql.DB, migrationsDir string, version uint, uri string) error {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		log.WithField("err", err).Error("failed to create DB migrations driver")
@@ -54,7 +54,8 @@ func runDBMigrations(db *sql.DB, migrationsDir, uri string) error {
 		return err
 	}
 	defer migrateClient.Close()
-	err = migrateClient.Up()
+	log.WithField("version", version).Info("applying DB migrations...")
+	err = migrateClient.Migrate(version)
 	if err != nil {
 		if err == migrate.ErrNoChange {
 			log.WithField("msg", err).Info("DB already at the latest migration")
