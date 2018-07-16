@@ -58,8 +58,8 @@ func (server HTTPServer) CreateUserHandler(resp http.ResponseWriter, req *http.R
 		writeError(resp, logger, err, "failed to create user", http.StatusInternalServerError)
 		return
 	}
-	resp.WriteHeader(http.StatusCreated)
 	resp.Header().Set("Location", fmt.Sprintf("/users/%v", id))
+	resp.WriteHeader(http.StatusCreated)
 }
 
 // ReadUsersHandler returns all stored users.
