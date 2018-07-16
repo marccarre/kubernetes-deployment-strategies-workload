@@ -48,16 +48,20 @@ func runDBMigrations(db *sql.DB, migrationsDir, uri string) error {
 		return err
 	}
 
-	migrate, err := migrate.NewWithDatabaseInstance("file://"+migrationsDir, "users", driver)
+	migrateClient, err := migrate.NewWithDatabaseInstance("file://"+migrationsDir, "users", driver)
 	if err != nil {
 		log.WithField("err", err).Error("failed to create DB migrations client")
 		return err
 	}
-	defer migrate.Close()
-	err = migrate.Up()
+	defer migrateClient.Close()
+	err = migrateClient.Up()
 	if err != nil {
-		log.WithField("err", err).Error("failed to run DB migrations")
-		return err
+		if err == migrate.ErrNoChange {
+			log.WithField("msg", err).Info("DB already at the latest migration")
+		} else {
+			log.WithField("err", err).Error("failed to run DB migrations")
+			return err
+		}
 	}
 	return nil
 }
