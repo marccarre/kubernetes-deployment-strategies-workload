@@ -26,8 +26,13 @@ func TestCreateAndReadUsers(t *testing.T) {
 	defer dbtest.Cleanup(t, database)
 	server := server.New(database)
 
-	req := get(t, "/users/1")
+	req := get(t, "/users")
 	resp := serve(req, server)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.Equal(t, "[]", body(t, resp.Body))
+
+	req = get(t, "/users/1")
+	resp = serve(req, server)
 	assert.Equal(t, http.StatusNotFound, resp.Code)
 	assert.Equal(t, "", body(t, resp.Body))
 

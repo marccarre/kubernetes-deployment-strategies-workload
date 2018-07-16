@@ -145,7 +145,7 @@ func debugSelect(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func scanUsers(rows *sql.Rows) ([]*domain.User, error) {
-	var users []*domain.User
+	users := []*domain.User{}
 	for rows.Next() {
 		user, err := scanOne(rows)
 		if err != nil {
