@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	lukeSkywalker = "{\"id\":1,\"firstName\":\"Luke\",\"familyName\":\"Skywalker\"}"
-	obiWanKenobi  = "{\"id\":2,\"firstName\":\"Obi-Wan\",\"familyName\":\"Kenobi\"}"
+	lukeSkywalker = "{\"id\":1,\"firstName\":\"Luke\",\"familyName\":\"Skywalker\",\"age\":20}"
+	obiWanKenobi  = "{\"id\":2,\"firstName\":\"Obi-Wan\",\"familyName\":\"Kenobi\",\"age\":40}"
 )
 
 func TestCreateAndReadUsers(t *testing.T) {
@@ -46,7 +46,7 @@ func TestCreateAndReadUsers(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, resp.Code)
 	assert.Equal(t, "", body(t, resp.Body))
 
-	req = post(t, "/users", "{\"firstName\":\"Luke\",\"familyName\":\"Skywalker\"}")
+	req = post(t, "/users", "{\"firstName\":\"Luke\",\"familyName\":\"Skywalker\",\"age\":20}")
 	resp = serve(req, server)
 	assert.Equal(t, http.StatusCreated, resp.Code)
 	assert.Equal(t, "/users/1", resp.Header().Get("Location"))
@@ -57,7 +57,7 @@ func TestCreateAndReadUsers(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.Code)
 	assert.Equal(t, lukeSkywalker, body(t, resp.Body))
 
-	req = post(t, "/users", "{\"firstName\":\"Obi-Wan\",\"familyName\":\"Kenobi\"}")
+	req = post(t, "/users", "{\"firstName\":\"Obi-Wan\",\"familyName\":\"Kenobi\",\"age\":40}")
 	resp = serve(req, server)
 	assert.Equal(t, http.StatusCreated, resp.Code)
 	assert.Equal(t, "/users/2", resp.Header().Get("Location"))

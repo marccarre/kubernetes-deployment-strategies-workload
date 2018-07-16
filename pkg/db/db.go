@@ -9,7 +9,7 @@ import (
 
 // SchemaVersion is the current version of the DB schema.
 // N.B.: this constant should be updated every time new migrations are added.
-const SchemaVersion = uint(1)
+const SchemaVersion = uint(2)
 
 // DB is the interface for a database client.
 type DB interface {

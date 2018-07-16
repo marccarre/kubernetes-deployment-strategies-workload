@@ -11,6 +11,7 @@ import (
 var user = domain.User{
 	FirstName:  "Luke",
 	FamilyName: "Skywalker",
+	Age:        20,
 }
 
 func TestFullNameShouldConcatenateFirstAndFamilyName(t *testing.T) {
@@ -20,7 +21,7 @@ func TestFullNameShouldConcatenateFirstAndFamilyName(t *testing.T) {
 func TestMarshalShouldReturnUserAsJSON(t *testing.T) {
 	bytes, err := user.Marshal()
 	assert.NoError(t, err)
-	assert.Equal(t, "{\"firstName\":\"Luke\",\"familyName\":\"Skywalker\"}", string(bytes))
+	assert.Equal(t, "{\"firstName\":\"Luke\",\"familyName\":\"Skywalker\",\"age\":20}", string(bytes))
 }
 
 func TestUnmarshalShouldReturnJSONAsUser(t *testing.T) {
@@ -30,6 +31,7 @@ func TestUnmarshalShouldReturnJSONAsUser(t *testing.T) {
 		ID:         1337,
 		FirstName:  "Foo",
 		FamilyName: "Bar",
+		Age:        0,
 	}, *user)
 }
 

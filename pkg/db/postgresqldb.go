@@ -87,6 +87,7 @@ const (
 	id         = "id"
 	firstName  = "first_name"
 	familyName = "family_name"
+	age        = "age"
 )
 
 // Ping ensures this database client can reach the database.
@@ -100,8 +101,8 @@ func (db PostgreSQLDB) CreateUser(ctx context.Context, user *domain.User) (int, 
 	err := debugInsert(
 		db.query().
 			Insert(users).
-			Columns(firstName, familyName).
-			Values(user.FirstName, user.FamilyName).
+			Columns(firstName, familyName, age).
+			Values(user.FirstName, user.FamilyName, user.Age).
 			Suffix("RETURNING id")).
 		QueryRowContext(ctx).
 		Scan(&id)
@@ -114,7 +115,7 @@ func (db PostgreSQLDB) CreateUser(ctx context.Context, user *domain.User) (int, 
 func (db PostgreSQLDB) selectUsers() sq.SelectBuilder {
 	// The order of the below columns ought to match
 	// the order of the fields in scanUser and scanOne:
-	return db.query().Select(id, firstName, familyName).From(users)
+	return db.query().Select(id, firstName, familyName, age).From(users)
 }
 
 // ReadUsers returns all stored users.
@@ -188,6 +189,7 @@ func scanOne(rows *sql.Rows) (*domain.User, error) {
 		&user.ID,
 		&user.FirstName,
 		&user.FamilyName,
+		&user.Age,
 	); err != nil {
 		return nil, err
 	}
@@ -202,6 +204,7 @@ func scanUser(row sq.RowScanner) (*domain.User, error) {
 		&user.ID,
 		&user.FirstName,
 		&user.FamilyName,
+		&user.Age,
 	); err != nil {
 		return nil, err
 	}

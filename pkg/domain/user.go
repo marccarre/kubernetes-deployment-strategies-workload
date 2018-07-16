@@ -10,6 +10,7 @@ type User struct {
 	ID         int    `json:"id,omitempty"`
 	FirstName  string `json:"firstName"`
 	FamilyName string `json:"familyName"`
+	Age        int    `json:"age"`
 }
 
 // FullName returns this user's full name.

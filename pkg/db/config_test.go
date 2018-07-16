@@ -20,7 +20,7 @@ func TestParsingEmptyArgumentsShouldReturnDefaultConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "postgres://postgres@localhost:5432/users?sslmode=disable", uri)
 	assert.Equal(t, "/home/service/migrations", config.MigrationsDir)
-	assert.Equal(t, uint(1), config.SchemaVersion)
+	assert.Equal(t, uint(2), config.SchemaVersion)
 }
 
 func TestParsingArgumentsShouldOverrideDefaultConfig(t *testing.T) {
