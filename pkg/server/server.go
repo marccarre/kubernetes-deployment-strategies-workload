@@ -28,17 +28,37 @@ func New(db db.DB) *HTTPServer {
 
 // RegisterRoutes registers the users API HTTP routes to the provided mux.Router.
 func (server *HTTPServer) RegisterRoutes(router *mux.Router) {
-	for _, route := range []struct {
-		name, method, path string
-		handler            http.HandlerFunc
-	}{
+	for _, route := range server.routes() {
+		router.Handle(route.Path, route.Handler).Methods(route.Method).Name(route.Name)
+	}
+}
+
+type route struct {
+	Name    string           `json:"-"`
+	Method  string           `json:"method"`
+	Path    string           `json:"path"`
+	Handler http.HandlerFunc `json:"-"`
+}
+
+func (server HTTPServer) routes() []route {
+	return []route{
+		{"routes", "GET", "/", server.Routes},
 		{"healthz", "GET", "/healthz", server.CheckHealth},
 		{"users", "POST", "/users", server.CreateUserHandler},
 		{"users", "GET", "/users", server.ReadUsersHandler},
 		{"users_id", "GET", "/users/{id:[0-9]+}", server.ReadUserByIDHandler},
-	} {
-		router.Handle(route.path, route.handler).Methods(route.method).Name(route.name)
 	}
+}
+
+// Routes lists this server's endpoints.
+func (server HTTPServer) Routes(resp http.ResponseWriter, req *http.Request) {
+	logger := log.WithField("method", req.Method).WithField("path", req.URL.Path)
+	bytes, err := json.Marshal(server.routes())
+	if err != nil {
+		writeError(resp, logger, err, "failed to serialise routes as JSON", http.StatusInternalServerError)
+		return
+	}
+	writeResponse(resp, logger, bytes)
 }
 
 // CheckHealth checks the health of this server.
