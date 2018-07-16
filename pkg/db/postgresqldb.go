@@ -119,7 +119,11 @@ func (db PostgreSQLDB) ReadUserByID(ctx context.Context, userID int) (*domain.Us
 		db.selectUsers().Where(sq.Eq{id: userID})).
 		QueryRowContext(ctx))
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, ErrNotFound
+		} else {
+			return nil, err
+		}
 	}
 	return user, nil
 }
