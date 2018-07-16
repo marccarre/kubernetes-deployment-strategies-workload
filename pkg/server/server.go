@@ -32,12 +32,24 @@ func (server *HTTPServer) RegisterRoutes(router *mux.Router) {
 		name, method, path string
 		handler            http.HandlerFunc
 	}{
+		{"healthz", "GET", "/healthz", server.CheckHealth},
 		{"users", "POST", "/users", server.CreateUserHandler},
 		{"users", "GET", "/users", server.ReadUsersHandler},
 		{"users_id", "GET", "/users/{id:[0-9]+}", server.ReadUserByIDHandler},
 	} {
 		router.Handle(route.path, route.handler).Methods(route.method).Name(route.name)
 	}
+}
+
+// CheckHealth checks the health of this server.
+func (server HTTPServer) CheckHealth(resp http.ResponseWriter, req *http.Request) {
+	logger := log.WithField("method", req.Method).WithField("path", req.URL.Path)
+	err := server.db.Ping(req.Context())
+	if err != nil {
+		writeError(resp, logger, err, "health check failed", http.StatusInternalServerError)
+		return
+	}
+	resp.WriteHeader(http.StatusNoContent)
 }
 
 // CreateUserHandler stores the provided user.

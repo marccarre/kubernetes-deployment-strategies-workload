@@ -9,6 +9,8 @@ import (
 
 // DB is the interface for a database client.
 type DB interface {
+	// Ping ensures this database client can reach the database.
+	Ping(ctx context.Context) error
 	// CreateUser stores the provided user.
 	CreateUser(ctx context.Context, user *domain.User) (int, error)
 	// ReadUsers returns all stored users.

@@ -74,6 +74,11 @@ const (
 	familyName = "family_name"
 )
 
+// Ping ensures this database client can reach the database.
+func (db PostgreSQLDB) Ping(ctx context.Context) error {
+	return db.db.PingContext(ctx)
+}
+
 // CreateUser stores the provided user.
 func (db PostgreSQLDB) CreateUser(ctx context.Context, user *domain.User) (int, error) {
 	var id int

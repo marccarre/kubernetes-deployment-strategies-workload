@@ -25,6 +25,11 @@ func NewInMemoryDB() *InMemoryDB {
 	}
 }
 
+// Ping ensures this database client can reach the database.
+func (database *InMemoryDB) Ping(ctx context.Context) error {
+	return nil // Nothing to check or connect to in this specific implementation of db.DB.
+}
+
 // CreateUser stores the provided user.
 func (database *InMemoryDB) CreateUser(_ context.Context, user *domain.User) (int, error) {
 	database.mutex.Lock()
