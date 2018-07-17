@@ -41,7 +41,7 @@ func NewPostgreSQLDB(config *Config) (*PostgreSQLDB, error) {
 	}, nil
 }
 
-func runDBMigrations(db *sql.DB, migrationsDir string, version uint, uri string) error {
+func runDBMigrations(db *sql.DB, migrationsDir string, targetVersion uint, uri string) error {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
 		log.WithField("err", err).Error("failed to create DB migrations driver")
@@ -54,14 +54,33 @@ func runDBMigrations(db *sql.DB, migrationsDir string, version uint, uri string)
 		return err
 	}
 	defer migrateClient.Close()
-	log.WithField("version", version).Info("applying DB migrations...")
-	err = migrateClient.Migrate(version)
-	if err != nil {
-		if err == migrate.ErrNoChange {
-			log.WithField("msg", err).Info("DB already at the latest migration")
+	return checkOrUpdateSchema(migrateClient, targetVersion)
+}
+
+func checkOrUpdateSchema(migrateClient *migrate.Migrate, targetVersion uint) error {
+	currentVersion, _, err := migrateClient.Version()
+	if err != nil && err != migrate.ErrNilVersion {
+		log.WithField("err", err).Error("failed to read DB's schema version")
+		return err
+	}
+	logger := log.WithField("currentVersion", currentVersion).WithField("targetVersion", targetVersion)
+	if currentVersion == targetVersion {
+		logger.Info("DB already at the target schema version")
+	} else {
+		if currentVersion < targetVersion {
+			logger.Info("upgrading DB schema...")
+			err = migrateClient.Up()
 		} else {
-			log.WithField("err", err).Error("failed to run DB migrations")
-			return err
+			logger.Info("downgrading DB schema...")
+			err = migrateClient.Down()
+		}
+		if err != nil {
+			if err == migrate.ErrNoChange {
+				logger.WithField("msg", err).Info("DB already at the target schema version")
+			} else {
+				logger.WithField("err", err).Error("failed to apply DB migrations")
+				return err
+			}
 		}
 	}
 	return nil
