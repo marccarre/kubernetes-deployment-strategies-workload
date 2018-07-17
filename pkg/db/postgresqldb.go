@@ -64,16 +64,11 @@ func checkOrUpdateSchema(migrateClient *migrate.Migrate, targetVersion uint) err
 		return err
 	}
 	logger := log.WithField("currentVersion", currentVersion).WithField("targetVersion", targetVersion)
-	if currentVersion == targetVersion {
-		logger.Info("DB already at the target schema version")
+	if currentVersion >= targetVersion {
+		logger.Info("nothing to do: DB already at or above the target schema version")
 	} else {
-		if currentVersion < targetVersion {
-			logger.Info("upgrading DB schema...")
-			err = migrateClient.Up()
-		} else {
-			logger.Info("downgrading DB schema...")
-			err = migrateClient.Down()
-		}
+		logger.Info("upgrading DB schema...")
+		err = migrateClient.Up()
 		if err != nil {
 			if err == migrate.ErrNoChange {
 				logger.WithField("msg", err).Info("DB already at the target schema version")
